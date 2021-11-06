@@ -1,0 +1,19 @@
+<h2>Subir archivo CSV</h2>
+<form method="POST" enctype="multipart/form-data" class="post-form">
+    {% csrf_token %}
+    <label for="csv">Seleccione archivo CSV:</label>
+    <input id="csv" type="file" name="file" />
+    <button type="submit" class="save btn btn-default">Enviar</button>
+</form>
+
+{% if data %}
+    <p>Tus consumos en el periodo {{ data.fechaMin|date:'d/m/Y' }} a {{ data.fechaMax|date:'d/m/Y' }} ({{ data.numDias.days }} días) han sido:</p>
+    <ul style="list-style-type: none;">
+        <li>Valle: {{ data.consumoValle|floatformat:1 }} kWh</li>
+        <li>Llano: {{ data.consumoLlano|floatformat:1 }} kWh</li>
+        <li>Punta: {{ data.consumoPunta|floatformat:1 }} kWh</li>
+        <li>Total: {{ data.consumoTotal|floatformat:1 }} kWh</li>
+        <li>Media: {{ data.consumoMedio|floatformat:1 }} kWh/día</li>
+    </ul>
+    <p>Número de filas: {{ data.numFilas }}</p>
+{% endif %}

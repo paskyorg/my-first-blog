@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from .forms import UploadFileForm
+from .forms import UploadFileForm, EdistribucionForm
 import datetime
 from . import utils
 
@@ -27,3 +27,13 @@ def upload_file(request):
         print("not POST method")
         form = UploadFileForm()
     return render(request, 'upload.html', {'form': form})
+
+def edistribucion(request):
+    if request.method == 'POST':
+        form = EdistribucionForm(request.POST)
+        if form.is_valid():
+            # Aquí tratamos la conexión con EDISTRIBUCIÓN
+            return HttpResponse(utils.getConsumo(request.POST))
+    else:
+        form = EdistribucionForm()
+    return render(request, 'edistribucion.html', {'form': form})

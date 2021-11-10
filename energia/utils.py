@@ -1,4 +1,7 @@
 import csv, io, os, datetime, pdb #holidays
+import pandas as pd
+from energia.ext.EdistribucionAPI import Edistribucion
+from itertools import chain
 
 def parseCSV(file):
     # es_holidays=holidays.Spain()
@@ -47,3 +50,26 @@ def parseCSV(file):
     print("Consumo Punta: {:.2f}".format(consumoPunta))
     print("Consumo Total: {:.2f}".format(consumoValle+consumoLlano+consumoPunta))
     print("Número de filas procesadas: {}".format(numFilas))
+
+def getConsumo(data):
+    user = data['user']
+    password = data['password']
+    consulta = data['consulta']
+    edis = Edistribucion(user, password)
+    edis.login()
+    conts = edis.get_list_cups()
+    # consumo = edis.get_consumo_byRange(conts[1])
+    if consulta == '1':
+        consumo = edis.get_consumo(conts[0])
+    elif consulta == '2':
+        consumo = edis.get_consumo_lastWeek(conts[0])
+    elif consulta == '3':
+        consumo = edis.get_consumo_lastMonth(conts[0])
+    else:
+        raise Exception('Consulta incorrecta')
+    # Pandas DataFrame from list of lists of dicts: https://stackoverflow.com/a/42304698/1390555
+    df = pd.DataFrame(list(chain.from_iterable(consumo)))
+    if 'a2' in df:
+        return df[['date', 'hourCCH', 'a2', 'value']].to_html()
+    return df[['date', 'hourCCH', 'value']].to_html()
+    #return consumo
